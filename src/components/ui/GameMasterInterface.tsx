@@ -164,9 +164,9 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
           {connectionState === 'connected' && <Wifi size={14} />}
           {connectionState === 'disconnected' && <WifiOff size={14} />}
           {connectionState === 'error' && <AlertCircle size={14} />}
-          {connectionState === 'connecting' && <span className="streaming-pulse" style={{ animation: 'pulse 2s infinite' }}>Connecting to PersonaPlex...</span>}
-          {connectionState === 'connected' && <span>PersonaPlex Local Active</span>}
-          {connectionState === 'error' && <span>PersonaPlex Local Unreachable</span>}
+          {connectionState === 'connecting' && <span className="streaming-pulse" style={{ animation: 'pulse 2s infinite' }}>Connecting to DungeonMaister...</span>}
+          {connectionState === 'connected' && <span>DungeonMaister Backend Active</span>}
+          {connectionState === 'error' && <span>DungeonMaister Backend Unreachable</span>}
         </div>
       </div>
 
