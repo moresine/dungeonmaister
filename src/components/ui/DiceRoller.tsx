@@ -1,106 +1,133 @@
 import { useState } from 'react';
-import { Dices, Check, X } from 'lucide-react';
+import { Dices } from 'lucide-react';
 
 export const DiceRoller = ({ onRoll }: { onRoll: (result: number) => void }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [manualMode, setManualMode] = useState(false);
-  const [manualInput, setManualInput] = useState('');
-  const [rolling, setRolling] = useState(false);
-  const [diceResult, setDiceResult] = useState<number | null>(null);
+  const [lastRoll, setLastRoll] = useState<number | null>(null);
+  const [flashingValue, setFlashingValue] = useState<number | null>(null);
 
-  const handleVirtualRoll = () => {
-    setRolling(true);
-    setDiceResult(null);
-    setTimeout(() => {
-      const result = Math.floor(Math.random() * 20) + 1;
-      setDiceResult(result);
-      setRolling(false);
-      onRoll(result);
-      setTimeout(() => setIsOpen(false), 2000);
-    }, 1500);
+  const handleRoll = (value: number) => {
+    setFlashingValue(value);
+    setLastRoll(value);
+    onRoll(value);
+    // Clear the flash effect after animation
+    setTimeout(() => setFlashingValue(null), 600);
   };
 
-  const submitManualRoll = () => {
-    const val = parseInt(manualInput, 10);
-    if (!isNaN(val) && val > 0 && val <= 20) {
-      onRoll(val);
-      setIsOpen(false);
-      setManualInput('');
-    }
-  };
+  const values = Array.from({ length: 20 }, (_, i) => i + 1);
 
   return (
-    <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 100 }}>
-      {!isOpen && (
-        <button 
-          onClick={() => setIsOpen(true)}
-          className="btn-primary"
-          style={{ width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 32px rgba(212, 175, 55, 0.4)' }}
-          title="Roll Dice"
-        >
-          <Dices size={32} />
-        </button>
-      )}
-
-      {isOpen && (
-        <div className="glass-panel" style={{ padding: '1.5rem', width: '300px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ margin: 0, color: 'var(--accent-gold)' }}>Roll D20</h3>
-            <button onClick={() => setIsOpen(false)} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}><X size={20}/></button>
-          </div>
-
-          <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(0,0,0,0.3)', padding: '0.25rem', borderRadius: '8px' }}>
-            <button 
-              onClick={() => setManualMode(false)}
-              style={{ flex: 1, padding: '0.5rem', background: !manualMode ? 'var(--panel-bg)' : 'transparent', border: 'none', borderRadius: '4px', color: !manualMode ? 'var(--accent-gold)' : 'var(--text-secondary)', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'var(--font-body)' }}>
-              Virtual
-            </button>
-            <button 
-              onClick={() => setManualMode(true)}
-              style={{ flex: 1, padding: '0.5rem', background: manualMode ? 'var(--panel-bg)' : 'transparent', border: 'none', borderRadius: '4px', color: manualMode ? 'var(--accent-gold)' : 'var(--text-secondary)', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'var(--font-body)' }}>
-              Manual
-            </button>
-          </div>
-
-          {!manualMode ? (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', padding: '1rem 0' }}>
-              <div style={{ 
-                width: '100px', height: '100px', 
-                border: '2px solid var(--accent-gold)', 
-                borderRadius: '16px', 
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '2.5rem', fontFamily: 'var(--font-heading)',
-                transform: rolling ? 'rotate(360deg)' : 'none',
-                transition: rolling ? 'transform 1.5s cubic-bezier(0.25, 1, 0.5, 1)' : 'none',
-                boxShadow: rolling ? '0 0 20px var(--accent-gold-glow)' : 'none',
-                background: 'rgba(212, 175, 55, 0.1)'
-              }}>
-                {rolling ? '...' : (diceResult || '20')}
-              </div>
-              <button className="btn-primary" onClick={handleVirtualRoll} disabled={rolling} style={{ width: '100%' }}>
-                Roll Now
-              </button>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem 0' }}>
-              <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Enter the result of your physical dice roll:</label>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <input 
-                  type="number" 
-                  min="1" max="20"
-                  value={manualInput}
-                  onChange={(e) => setManualInput(e.target.value)}
-                  style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--panel-border)', background: 'rgba(0,0,0,0.5)', color: 'white', fontSize: '1.2rem', textAlign: 'center' }}
-                  placeholder="1-20"
-                />
-                <button className="btn-primary" onClick={submitManualRoll} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 1rem' }}>
-                  <Check size={20} />
-                </button>
-              </div>
-            </div>
+    <div style={{
+      position: 'fixed',
+      bottom: '1.5rem',
+      right: '1.5rem',
+      zIndex: 100,
+      width: '240px'
+    }}>
+      <div className="glass-panel" style={{
+        padding: '1rem',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.75rem'
+      }}>
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          color: 'var(--accent-gold)',
+          fontFamily: 'var(--font-heading)',
+          fontSize: '0.85rem',
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase'
+        }}>
+          <Dices size={16} />
+          <span>D20 — Tap your roll</span>
+          {lastRoll !== null && (
+            <span style={{
+              marginLeft: 'auto',
+              background: lastRoll === 20 ? 'rgba(16, 185, 129, 0.3)' : lastRoll === 1 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(212, 175, 55, 0.2)',
+              border: `1px solid ${lastRoll === 20 ? '#10b981' : lastRoll === 1 ? 'var(--accent-danger)' : 'rgba(212, 175, 55, 0.4)'}`,
+              padding: '0.15rem 0.5rem',
+              borderRadius: '4px',
+              fontSize: '0.8rem',
+              color: lastRoll === 20 ? '#10b981' : lastRoll === 1 ? 'var(--accent-danger)' : 'var(--accent-gold)'
+            }}>
+              {lastRoll}
+            </span>
           )}
         </div>
-      )}
+
+        {/* Grid of 1-20 */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(5, 1fr)',
+          gap: '4px'
+        }}>
+          {values.map(v => {
+            const isNat20 = v === 20;
+            const isNat1 = v === 1;
+            const isFlashing = flashingValue === v;
+            const isLast = lastRoll === v && !isFlashing;
+
+            return (
+              <button
+                key={v}
+                onClick={() => handleRoll(v)}
+                style={{
+                  width: '100%',
+                  aspectRatio: '1',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '6px',
+                  border: `1px solid ${
+                    isFlashing
+                      ? 'var(--accent-gold)'
+                      : isLast
+                        ? 'rgba(212, 175, 55, 0.5)'
+                        : isNat20
+                          ? 'rgba(16, 185, 129, 0.3)'
+                          : isNat1
+                            ? 'rgba(239, 68, 68, 0.3)'
+                            : 'rgba(255,255,255,0.08)'
+                  }`,
+                  background: isFlashing
+                    ? 'rgba(212, 175, 55, 0.35)'
+                    : isLast
+                      ? 'rgba(212, 175, 55, 0.12)'
+                      : isNat20
+                        ? 'rgba(16, 185, 129, 0.08)'
+                        : isNat1
+                          ? 'rgba(239, 68, 68, 0.08)'
+                          : 'rgba(255,255,255,0.03)',
+                  color: isFlashing
+                    ? 'var(--accent-gold)'
+                    : isLast
+                      ? 'var(--accent-gold)'
+                      : isNat20
+                        ? '#10b981'
+                        : isNat1
+                          ? 'var(--accent-danger)'
+                          : 'var(--text-primary)',
+                  fontSize: '0.9rem',
+                  fontWeight: (isNat20 || isNat1 || isFlashing || isLast) ? 'bold' : 'normal',
+                  fontFamily: 'var(--font-heading)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  transform: isFlashing ? 'scale(1.15)' : 'scale(1)',
+                  boxShadow: isFlashing
+                    ? '0 0 12px rgba(212, 175, 55, 0.6)'
+                    : 'none',
+                  padding: 0
+                }}
+                title={`Roll ${v}`}
+              >
+                {v}
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };
