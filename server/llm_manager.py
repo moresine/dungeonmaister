@@ -17,12 +17,27 @@ class LLMManager:
             "CRITICAL RULE: You NEVER roll dice yourself, not for yourself and not for the players. "
             "Whenever a situation requires a dice roll, you MUST ask the players to roll their dice "
             "and tell you the result. Wait for them to report what they rolled before resolving the outcome. "
-            "Never say things like 'I roll a 15' or 'You roll a 12'. Always say 'Roll your dice!' or similar."
+            "Never say things like 'I roll a 15' or 'You roll a 12'. Always say 'Roll your dice!' or similar. "
+            "FORMATTING RULE: Your responses will be read aloud by a text-to-speech engine. "
+            "NEVER use asterisks, markdown, bullet points, numbered lists, hashtags, or any special formatting. "
+            "Write everything as plain spoken language. No *emphasis*, no **bold**, no _italics_, no emojis. "
+            "Just natural speech as if you were talking out loud."
         )
         self.history = [
             {"role": "system", "content": self.system_prompt}
         ]
         self.rag = RAGEngine()
+
+    @staticmethod
+    def sanitize_for_tts(text: str) -> str:
+        """Strip out any special characters that TTS can't handle well."""
+        # Remove markdown-style formatting: *bold*, **bold**, _italic_, __italic__
+        text = re.sub(r'[*_~`#]', '', text)
+        # Remove emoji and other unicode symbols (keep basic latin, punctuation, accented chars)
+        text = re.sub(r'[^\w\s.,!?;:\'\"()\-—…\n]', '', text)
+        # Collapse multiple spaces
+        text = re.sub(r'  +', ' ', text)
+        return text.strip()
 
     async def generate_sentences(self, user_input: str):
         # Fetch relevant rules or adventure content via RAG vector search
@@ -52,11 +67,15 @@ class LLMManager:
                 # Yield when we hit a sentence boundary for smooth TTS
                 if sentence_end.search(buffer):
                     parts = sentence_end.split(buffer, 1)
-                    yield parts[0].strip()
+                    cleaned = self.sanitize_for_tts(parts[0].strip())
+                    if cleaned:
+                        yield cleaned
                     buffer = parts[1] if len(parts) > 1 else ""
                     
             if buffer.strip():
-                yield buffer.strip()
+                cleaned = self.sanitize_for_tts(buffer.strip())
+                if cleaned:
+                    yield cleaned
                 
             # Append assistant response to history
             self.history.append({"role": "assistant", "content": full_response})
