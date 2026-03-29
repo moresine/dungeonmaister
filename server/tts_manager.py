@@ -39,7 +39,15 @@ class TTSManager:
             
         # Escape single quotes in text for bash
         safe_text = text.replace("'", "'\\''")
-        piper_cmd = f"echo '{safe_text}' | ./venv/bin/piper --model {model_path} --output_file -"
+        # Voice tuning for old wizard character:
+        #   --length-scale 1.15  = slightly slower, deliberate pacing
+        #   --noise-scale 0.8    = more expressive variation
+        #   --noise-w 0.9        = more natural phoneme width
+        #   --sentence-silence 0.3 = dramatic pause between sentences
+        piper_cmd = (
+            f"echo '{safe_text}' | ./venv/bin/piper --model {model_path} --output_file - "
+            f"--length-scale 1.15 --noise-scale 0.8 --noise-w 0.9 --sentence-silence 0.3"
+        )
         
         proc = await asyncio.create_subprocess_shell(
             piper_cmd,
