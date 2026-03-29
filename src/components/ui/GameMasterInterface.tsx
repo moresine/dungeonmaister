@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Mic, MicOff, Send, Wifi, WifiOff, AlertCircle } from 'lucide-react';
+import { Mic, MicOff, Send, Wifi, WifiOff, AlertCircle, Radio } from 'lucide-react';
 import { dmInstance } from '../../services/AiDungeonMaster';
 import { SpeechClient } from '../../services/SpeechClient';
 
@@ -8,7 +8,9 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
     { role: 'dm', content: 'Ah, travelers! Welcome to the tavern. I am the DungeonMaister. Are you ready to begin your journey, or shall we start with a tutorial of the rules?' }
   ]);
   const [inputText, setInputText] = useState('');
-  const [isRecording, setIsRecording] = useState(false);
+  const [isSessionActive, setIsSessionActive] = useState(false);
+  const [isMicOpen, setIsMicOpen] = useState(false);
+  const [isDmSpeaking, setIsDmSpeaking] = useState(false);
   const [connectionState, setConnectionState] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
   const clientRef = useRef<SpeechClient | null>(null);
   
@@ -35,10 +37,7 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
     if (!textOverride) setInputText('');
 
     if (connectionState === 'connected' && clientRef.current) {
-       // Only send manual text explicitly if the client is connected
-       // SpeechClient sends spoken text automatically.
        if (!textOverride) {
-          // If it was a typed message from the input box, send it manually via the socket
           clientRef.current.sendText(text);
        }
        if (diceRoll) {
@@ -60,35 +59,56 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestDiceRoll]);
 
-  const toggleVoiceMode = async () => {
-    if (isRecording) {
+  /** Connect/disconnect the WebSocket session */
+  const toggleSession = async () => {
+    if (isSessionActive) {
       if (clientRef.current) clientRef.current.stop();
-      setIsRecording(false);
+      setIsSessionActive(false);
+      setIsMicOpen(false);
+      setIsDmSpeaking(false);
       setConnectionState('disconnected');
     } else {
-      setIsRecording(true);
+      setIsSessionActive(true);
       setConnectionState('connecting');
       
       const onMessage = (speaker: 'user' | 'dm', msg: string) => {
-        setMessages(prev => {
-          // If the user spoke, we don't want to duplicate messages if they rapidly trigger multiple transcript lines.
-          // For now, simply appending.
-          return [...prev, { role: speaker, content: msg }];
-        });
+        setMessages(prev => [...prev, { role: speaker, content: msg }]);
       };
       
       const onState = (state: 'connected' | 'disconnected' | 'error') => {
         setConnectionState(state);
         if (state === 'error' || state === 'disconnected') {
-          setIsRecording(false);
+          setIsSessionActive(false);
+          setIsMicOpen(false);
+          setIsDmSpeaking(false);
         }
       };
 
-      const client = new SpeechClient(onMessage, onState);
+      const onDmSpeaking = (speaking: boolean) => {
+        setIsDmSpeaking(speaking);
+        if (speaking) {
+          setIsMicOpen(false);
+        }
+      };
+
+      const client = new SpeechClient(onMessage, onState, onDmSpeaking);
       clientRef.current = client;
       
-      // Connect to the new Python FastAPI backend serving our XTTSv2 and Ollama pipeline
       await client.connect(`ws://${window.location.hostname}:8001/api/chat/stream`);
+    }
+  };
+
+  /** Push-to-talk: toggle mic on/off */
+  const toggleMic = () => {
+    if (!clientRef.current || connectionState !== 'connected') return;
+    if (isDmSpeaking) return; // Can't talk while DM is speaking
+    
+    if (isMicOpen) {
+      clientRef.current.closeMic();
+      setIsMicOpen(false);
+    } else {
+      clientRef.current.openMic();
+      setIsMicOpen(true);
     }
   };
 
@@ -101,7 +121,7 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
     let animationFrame: number;
     let stream: MediaStream;
 
-    if (isRecording) {
+    if (isMicOpen) {
       navigator.mediaDevices.getUserMedia({ audio: true }).then((s) => {
         stream = s;
         audioContext = new AudioContext();
@@ -119,7 +139,6 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
             sum += dataArray[i];
           }
           const average = sum / dataArray.length;
-          // Scale it up a bit so it looks reactive
           setAudioLevel(average * 2);
           animationFrame = requestAnimationFrame(checkLevel);
         };
@@ -135,7 +154,7 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
       if (audioContext && audioContext.state !== 'closed') audioContext.close();
       setAudioLevel(0);
     };
-  }, [isRecording]);
+  }, [isMicOpen]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 4rem)', maxHeight: '800px', maxWidth: '1000px', margin: '2rem auto', padding: '0 1rem' }}>
@@ -150,6 +169,24 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
           {connectionState === 'error' && <span>PersonaPlex Local Unreachable</span>}
         </div>
       </div>
+
+      {/* DM Speaking indicator */}
+      {isDmSpeaking && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '0.5rem',
+          padding: '0.5rem 1rem', marginBottom: '0.5rem',
+          borderRadius: '8px',
+          background: 'rgba(139, 92, 246, 0.15)',
+          border: '1px solid rgba(139, 92, 246, 0.3)',
+          color: 'var(--accent-magic)',
+          fontSize: '0.85rem',
+          animation: 'pulse 2s infinite'
+        }}>
+          <Radio size={14} />
+          <span>The DungeonMaister is speaking — mic is muted</span>
+        </div>
+      )}
+
       <div className="glass-panel" style={{ flex: 1, padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', overflowY: 'auto' }} ref={logRef}>
         {messages.map((msg, idx) => (
           <div key={idx} style={{ 
@@ -183,7 +220,8 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
       </div>
 
       <div className="glass-panel" style={{ marginTop: '1.5rem', padding: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
-        {isRecording && (
+        {/* Audio level bar when mic is open */}
+        {isMicOpen && (
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'rgba(255,255,255,0.05)' }}>
             <div style={{ 
               height: '100%', 
@@ -194,34 +232,87 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
             }} />
           </div>
         )}
+
+        {/* Session toggle (connect/disconnect) */}
         <button 
-          onClick={toggleVoiceMode}
+          onClick={toggleSession}
           style={{ 
-            background: isRecording ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255,255,255,0.05)',
-            border: `1px solid ${isRecording ? 'var(--accent-danger)' : 'var(--panel-border)'}`,
-            color: isRecording ? 'var(--accent-danger)' : 'var(--text-primary)',
-            padding: '1rem',
+            background: isSessionActive ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,255,255,0.05)',
+            border: `1px solid ${isSessionActive ? '#10b981' : 'var(--panel-border)'}`,
+            color: isSessionActive ? '#10b981' : 'var(--text-primary)',
+            padding: '0.75rem',
             borderRadius: '50%',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             transition: 'all 0.3s',
-            boxShadow: isRecording ? '0 0 15px rgba(239, 68, 68, 0.5)' : 'none'
+            boxShadow: isSessionActive ? '0 0 10px rgba(16, 185, 129, 0.3)' : 'none',
+            flexShrink: 0
           }}
-          title={isRecording ? "Stop Recording" : "Start Voice Interaction"}
+          title={isSessionActive ? "Disconnect Voice Session" : "Connect Voice Session"}
         >
-          {isRecording ? <MicOff size={24} /> : <Mic size={24} />}
+          {isSessionActive ? <Wifi size={18} /> : <WifiOff size={18} />}
         </button>
+
+        {/* Push-to-talk button */}
+        <button 
+          onClick={toggleMic}
+          disabled={!isSessionActive || connectionState !== 'connected' || isDmSpeaking}
+          style={{ 
+            background: isMicOpen 
+              ? 'rgba(239, 68, 68, 0.2)' 
+              : isDmSpeaking 
+                ? 'rgba(139, 92, 246, 0.1)' 
+                : 'rgba(212, 175, 55, 0.15)',
+            border: `1px solid ${
+              isMicOpen 
+                ? 'var(--accent-danger)' 
+                : isDmSpeaking 
+                  ? 'rgba(139, 92, 246, 0.3)' 
+                  : (!isSessionActive || connectionState !== 'connected') 
+                    ? 'var(--panel-border)' 
+                    : 'rgba(212, 175, 55, 0.5)'
+            }`,
+            color: isMicOpen 
+              ? 'var(--accent-danger)' 
+              : isDmSpeaking 
+                ? 'rgba(139, 92, 246, 0.5)' 
+                : (!isSessionActive || connectionState !== 'connected') 
+                  ? 'var(--text-secondary)' 
+                  : 'var(--accent-gold)',
+            padding: '1rem',
+            borderRadius: '50%',
+            cursor: (!isSessionActive || connectionState !== 'connected' || isDmSpeaking) ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.3s',
+            boxShadow: isMicOpen ? '0 0 15px rgba(239, 68, 68, 0.5)' : 'none',
+            opacity: (!isSessionActive || connectionState !== 'connected') ? 0.4 : 1,
+            flexShrink: 0
+          }}
+          title={
+            isDmSpeaking 
+              ? "DM is speaking — wait for your turn" 
+              : isMicOpen 
+                ? "Release to stop talking" 
+                : "Push to talk"
+          }
+        >
+          {isMicOpen ? <MicOff size={24} /> : <Mic size={24} />}
+        </button>
+
         <input 
           type="text" 
           value={inputText}
           onChange={e => setInputText(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSend()}
-          placeholder="Speak to the DungeonMaister or type here..."
+          placeholder={isDmSpeaking ? "The DungeonMaister is speaking..." : "Speak to the DungeonMaister or type here..."}
+          disabled={isDmSpeaking}
           style={{ flex: 1, padding: '1rem', borderRadius: '8px', border: '1px solid var(--panel-border)', background: 'rgba(0,0,0,0.5)', color: 'white', fontSize: '1.1rem', fontFamily: 'var(--font-body)' }}
         />
-        <button className="btn-primary" onClick={() => handleSend()} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '1rem 1.5rem' }}>
+        <button className="btn-primary" onClick={() => handleSend()} disabled={isDmSpeaking} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '1rem 1.5rem', opacity: isDmSpeaking ? 0.4 : 1 }}>
           <Send size={20} />
         </button>
       </div>

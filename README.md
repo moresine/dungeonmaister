@@ -52,7 +52,7 @@ pip install fastapi uvicorn ollama piper-tts langchain-community chromadb senten
 # Models: https://github.com/rhasspy/piper/blob/master/VOICES.md
 
 # Start the backend
-python main.py
+./start_backend.sh
 ```
 
 The backend server will start on `http://localhost:8001`.
