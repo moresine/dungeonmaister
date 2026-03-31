@@ -1,0 +1,1482 @@
+{
+  "table_of_contents": [
+    {
+      "title": "Inhaltsverzeichnis",
+      "heading_level": null,
+      "page_id": 0,
+      "polygon": [
+        [
+          85.5,
+          543.0
+        ],
+        [
+          276.0,
+          542.1796875
+        ],
+        [
+          276.0,
+          564.0
+        ],
+        [
+          85.5,
+          561.75
+        ]
+      ]
+    },
+    {
+      "title": "Einf\u00fchrung",
+      "heading_level": null,
+      "page_id": 1,
+      "polygon": [
+        [
+          52.892578125,
+          110.8778076171875
+        ],
+        [
+          182.0904083251953,
+          110.8778076171875
+        ],
+        [
+          182.0904083251953,
+          134.8778076171875
+        ],
+        [
+          52.892578125,
+          134.8778076171875
+        ]
+      ]
+    },
+    {
+      "title": "Das Abenteuer leiten",
+      "heading_level": null,
+      "page_id": 1,
+      "polygon": [
+        [
+          54.0,
+          264.44268798828125
+        ],
+        [
+          246.9739990234375,
+          264.44268798828125
+        ],
+        [
+          246.9739990234375,
+          284.44268798828125
+        ],
+        [
+          54.0,
+          284.44268798828125
+        ]
+      ]
+    },
+    {
+      "title": "Der Spielleiter",
+      "heading_level": null,
+      "page_id": 1,
+      "polygon": [
+        [
+          53.7890625,
+          472.2265625
+        ],
+        [
+          158.9765625,
+          472.2265625
+        ],
+        [
+          158.9765625,
+          487.2265625
+        ],
+        [
+          53.7890625,
+          487.2265625
+        ]
+      ]
+    },
+    {
+      "title": "Regeln f\u00fcr das Spiel",
+      "heading_level": null,
+      "page_id": 1,
+      "polygon": [
+        [
+          317.35546875,
+          301.25390625
+        ],
+        [
+          414.2447814941406,
+          301.25390625
+        ],
+        [
+          414.2447814941406,
+          312.96856689453125
+        ],
+        [
+          316.16015625,
+          312.96856689453125
+        ]
+      ]
+    },
+    {
+      "title": "Attributsw\u00fcrfe improvisieren",
+      "heading_level": null,
+      "page_id": 1,
+      "polygon": [
+        [
+          311.37890625,
+          616.3973388671875
+        ],
+        [
+          520.3382568359375,
+          616.3973388671875
+        ],
+        [
+          520.3382568359375,
+          631.3973388671875
+        ],
+        [
+          311.37890625,
+          631.3973388671875
+        ]
+      ]
+    },
+    {
+      "title": "Glossar",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          62.75390625,
+          385.3663330078125
+        ],
+        [
+          118.46549224853516,
+          384.01171875
+        ],
+        [
+          118.46549224853516,
+          400.3663330078125
+        ],
+        [
+          61.55859375,
+          400.3663330078125
+        ]
+      ]
+    },
+    {
+      "title": "Magische Gegenst\u00e4nde und \nMonster",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          61.55859375,
+          650.9863433837891
+        ],
+        [
+          253.80296325683594,
+          650.84765625
+        ],
+        [
+          253.80296325683594,
+          680.9863586425781
+        ],
+        [
+          61.55859375,
+          680.9863586425781
+        ]
+      ]
+    },
+    {
+      "title": "Abk\u00fcrzungen",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          320.94140625,
+          77.36627197265625
+        ],
+        [
+          414.52679443359375,
+          77.36627197265625
+        ],
+        [
+          414.52679443359375,
+          92.36627197265625
+        ],
+        [
+          320.94140625,
+          92.36627197265625
+        ]
+      ]
+    },
+    {
+      "title": "Hintergrund",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          321.837890625,
+          168.8717041015625
+        ],
+        [
+          440.4707946777344,
+          168.8717041015625
+        ],
+        [
+          440.4707946777344,
+          188.8717041015625
+        ],
+        [
+          321.837890625,
+          188.8717041015625
+        ]
+      ]
+    },
+    {
+      "title": "\u00dcbersicht",
+      "heading_level": null,
+      "page_id": 2,
+      "polygon": [
+        [
+          322.498779296875,
+          566.54296875
+        ],
+        [
+          411.4347839355469,
+          566.54296875
+        ],
+        [
+          411.4347839355469,
+          586.8717651367188
+        ],
+        [
+          321.5390625,
+          586.8717651367188
+        ]
+      ]
+    },
+    {
+      "title": "Abenteueraufh\u00e4nger",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          53.490234375,
+          467.58245849609375
+        ],
+        [
+          245.337890625,
+          467.58245849609375
+        ],
+        [
+          245.30198669433594,
+          487.58245849609375
+        ],
+        [
+          52.294921875,
+          487.58245849609375
+        ]
+      ]
+    },
+    {
+      "title": "Die Vergessenen Reiche",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          54.0,
+          635.5823669433594
+        ],
+        [
+          264.1640625,
+          635.5823669433594
+        ],
+        [
+          263.9420166015625,
+          655.5823669433594
+        ],
+        [
+          53.7890625,
+          655.5823669433594
+        ]
+      ]
+    },
+    {
+      "title": "Rollenspiel und Inspiration",
+      "heading_level": null,
+      "page_id": 3,
+      "polygon": [
+        [
+          315.5625,
+          445.88671875
+        ],
+        [
+          451.25482177734375,
+          445.88671875
+        ],
+        [
+          451.25482177734375,
+          457.11053466796875
+        ],
+        [
+          315.5625,
+          457.11053466796875
+        ]
+      ]
+    },
+    {
+      "title": "Den Wagen lenken",
+      "heading_level": null,
+      "page_id": 5,
+      "polygon": [
+        [
+          310.78125,
+          164.7421875
+        ],
+        [
+          413.9759521484375,
+          163.1953125
+        ],
+        [
+          413.9759521484375,
+          176.9212646484375
+        ],
+        [
+          309.5859375,
+          176.9212646484375
+        ]
+      ]
+    },
+    {
+      "title": "Goblin-Hinterhalt",
+      "heading_level": null,
+      "page_id": 5,
+      "polygon": [
+        [
+          311.677734375,
+          319.2071838378906
+        ],
+        [
+          490.7507629394531,
+          319.2071838378906
+        ],
+        [
+          490.7507629394531,
+          339.2071838378906
+        ],
+        [
+          311.677734375,
+          339.2071838378906
+        ]
+      ]
+    },
+    {
+      "title": "Entwicklungen",
+      "heading_level": null,
+      "page_id": 6,
+      "polygon": [
+        [
+          62.455078125,
+          222.51641845703125
+        ],
+        [
+          148.13038635253906,
+          221.9765625
+        ],
+        [
+          148.13038635253906,
+          234.51641845703125
+        ],
+        [
+          62.455078125,
+          234.51641845703125
+        ]
+      ]
+    },
+    {
+      "title": "Rasten",
+      "heading_level": null,
+      "page_id": 6,
+      "polygon": [
+        [
+          67.53515625,
+          541.01953125
+        ],
+        [
+          100.75599670410156,
+          539.47265625
+        ],
+        [
+          100.75599670410156,
+          551.8305511474609
+        ],
+        [
+          66.33984375,
+          551.8305511474609
+        ]
+      ]
+    },
+    {
+      "title": "Goblinpfad",
+      "heading_level": null,
+      "page_id": 6,
+      "polygon": [
+        [
+          62.455078125,
+          605.2594451904297
+        ],
+        [
+          141.5070037841797,
+          605.21484375
+        ],
+        [
+          141.5070037841797,
+          620.2594451904297
+        ],
+        [
+          62.455078125,
+          620.2594451904297
+        ]
+      ]
+    },
+    {
+      "title": "Erfahrungspunkte",
+      "heading_level": null,
+      "page_id": 6,
+      "polygon": [
+        [
+          321.5390625,
+          387.3662414550781
+        ],
+        [
+          451.4913024902344,
+          387.3662414550781
+        ],
+        [
+          451.4913024902344,
+          402.3662414550781
+        ],
+        [
+          320.34375,
+          402.3662414550781
+        ]
+      ]
+    },
+    {
+      "title": "Cragmaw-Versteck",
+      "heading_level": null,
+      "page_id": 6,
+      "polygon": [
+        [
+          321.837890625,
+          453.20245361328125
+        ],
+        [
+          491.7947998046875,
+          452.4609375
+        ],
+        [
+          491.7947998046875,
+          473.20245361328125
+        ],
+        [
+          320.642578125,
+          473.20245361328125
+        ]
+      ]
+    },
+    {
+      "title": "Allgemeine Merkmale",
+      "heading_level": null,
+      "page_id": 6,
+      "polygon": [
+        [
+          320.044921875,
+          610.9862518310547
+        ],
+        [
+          475.89630126953125,
+          610.9862518310547
+        ],
+        [
+          475.89630126953125,
+          625.9862518310547
+        ],
+        [
+          320.044921875,
+          625.9862518310547
+        ]
+      ]
+    },
+    {
+      "title": "Was die Goblins wissen",
+      "heading_level": null,
+      "page_id": 7,
+      "polygon": [
+        [
+          59.0,
+          177.1171875
+        ],
+        [
+          168.68600463867188,
+          175.5703125
+        ],
+        [
+          168.68600463867188,
+          187.5106201171875
+        ],
+        [
+          58.5703125,
+          187.5106201171875
+        ]
+      ]
+    },
+    {
+      "title": "1. H\u00f6hlen\u00f6ffnung",
+      "heading_level": null,
+      "page_id": 7,
+      "polygon": [
+        [
+          53.490234375,
+          424.2740478515625
+        ],
+        [
+          178.55099487304688,
+          424.2740478515625
+        ],
+        [
+          178.55099487304688,
+          439.2740478515625
+        ],
+        [
+          53.490234375,
+          439.2740478515625
+        ]
+      ]
+    },
+    {
+      "title": "Entwicklungen",
+      "heading_level": null,
+      "page_id": 7,
+      "polygon": [
+        [
+          52.892578125,
+          575.2443084716797
+        ],
+        [
+          139.13038635253906,
+          575.2443084716797
+        ],
+        [
+          139.13038635253906,
+          587.2443084716797
+        ],
+        [
+          52.892578125,
+          587.2443084716797
+        ]
+      ]
+    },
+    {
+      "title": "2. Goblinwachposten",
+      "heading_level": null,
+      "page_id": 7,
+      "polygon": [
+        [
+          310.482421875,
+          39.64617919921875
+        ],
+        [
+          458.8412780761719,
+          39.4453125
+        ],
+        [
+          458.8412780761719,
+          54.64617919921875
+        ],
+        [
+          310.482421875,
+          54.64617919921875
+        ]
+      ]
+    },
+    {
+      "title": "3. Zwinger",
+      "heading_level": null,
+      "page_id": 7,
+      "polygon": [
+        [
+          311.9765625,
+          396.46624755859375
+        ],
+        [
+          384.7922668457031,
+          396.46624755859375
+        ],
+        [
+          384.7922668457031,
+          411.46624755859375
+        ],
+        [
+          311.9765625,
+          411.46624755859375
+        ]
+      ]
+    },
+    {
+      "title": "Entwicklungen",
+      "heading_level": null,
+      "page_id": 8,
+      "polygon": [
+        [
+          62.455078125,
+          474.5058288574219
+        ],
+        [
+          148.13038635253906,
+          474.5058288574219
+        ],
+        [
+          148.13038635253906,
+          486.5058288574219
+        ],
+        [
+          62.455078125,
+          486.5058288574219
+        ]
+      ]
+    },
+    {
+      "title": "4. Steiler Durchgang",
+      "heading_level": null,
+      "page_id": 8,
+      "polygon": [
+        [
+          63.0,
+          598.5755310058594
+        ],
+        [
+          210.41697692871094,
+          598.5755310058594
+        ],
+        [
+          210.41697692871094,
+          613.5755310058594
+        ],
+        [
+          61.857421875,
+          613.5755310058594
+        ]
+      ]
+    },
+    {
+      "title": "Abenteuerkarten",
+      "heading_level": null,
+      "page_id": 8,
+      "polygon": [
+        [
+          325.125,
+          417.26953125
+        ],
+        [
+          408.1227722167969,
+          417.26953125
+        ],
+        [
+          408.1227722167969,
+          428.4931640625
+        ],
+        [
+          325.125,
+          428.4931640625
+        ]
+      ]
+    },
+    {
+      "title": "5. \u00dcberf\u00fchrung",
+      "heading_level": null,
+      "page_id": 9,
+      "polygon": [
+        [
+          54.0,
+          320.203125
+        ],
+        [
+          161.37449645996094,
+          320.203125
+        ],
+        [
+          161.37449645996094,
+          336.8662414550781
+        ],
+        [
+          54.0,
+          336.8662414550781
+        ]
+      ]
+    },
+    {
+      "title": "\u00dcberflutung!",
+      "heading_level": null,
+      "page_id": 9,
+      "polygon": [
+        [
+          312.275390625,
+          98.01641845703125
+        ],
+        [
+          388.3031921386719,
+          96.6796875
+        ],
+        [
+          388.3031921386719,
+          110.01641845703125
+        ],
+        [
+          312.275390625,
+          110.01641845703125
+        ]
+      ]
+    },
+    {
+      "title": "6. Goblinbehausung",
+      "heading_level": null,
+      "page_id": 9,
+      "polygon": [
+        [
+          311.080078125,
+          423.7862548828125
+        ],
+        [
+          451.45977783203125,
+          423.7862548828125
+        ],
+        [
+          451.45977783203125,
+          438.7862548828125
+        ],
+        [
+          311.080078125,
+          438.7862548828125
+        ]
+      ]
+    },
+    {
+      "title": "Sildar spielen",
+      "heading_level": null,
+      "page_id": 10,
+      "polygon": [
+        [
+          62.455078125,
+          158.01641845703125
+        ],
+        [
+          139.16757202148438,
+          158.01641845703125
+        ],
+        [
+          139.16757202148438,
+          170.01641845703125
+        ],
+        [
+          61.259765625,
+          170.01641845703125
+        ]
+      ]
+    },
+    {
+      "title": "Entwicklungen",
+      "heading_level": null,
+      "page_id": 10,
+      "polygon": [
+        [
+          320.642578125,
+          40.11651611328125
+        ],
+        [
+          407.6291809082031,
+          39.83203125
+        ],
+        [
+          407.6291809082031,
+          52.11651611328125
+        ],
+        [
+          320.642578125,
+          52.11651611328125
+        ]
+      ]
+    },
+    {
+      "title": "Sch\u00e4tze",
+      "heading_level": null,
+      "page_id": 10,
+      "polygon": [
+        [
+          320.642578125,
+          140.33642578125
+        ],
+        [
+          365.95318603515625,
+          139.9921875
+        ],
+        [
+          365.95318603515625,
+          152.33642578125
+        ],
+        [
+          320.642578125,
+          152.33642578125
+        ]
+      ]
+    },
+    {
+      "title": "NSC-Gruppenmitglieder",
+      "heading_level": null,
+      "page_id": 10,
+      "polygon": [
+        [
+          326.619140625,
+          198.38671875
+        ],
+        [
+          439.579833984375,
+          196.83984375
+        ],
+        [
+          439.579833984375,
+          208.8848876953125
+        ],
+        [
+          326.619140625,
+          208.8848876953125
+        ]
+      ]
+    },
+    {
+      "title": "7. Doppelbeckenh\u00f6hle",
+      "heading_level": null,
+      "page_id": 10,
+      "polygon": [
+        [
+          322.13671875,
+          489.9062194824219
+        ],
+        [
+          473.9718017578125,
+          489.9062194824219
+        ],
+        [
+          473.9718017578125,
+          504.9062194824219
+        ],
+        [
+          322.13671875,
+          504.9062194824219
+        ]
+      ]
+    },
+    {
+      "title": "8. Klargs H\u00f6hle",
+      "heading_level": null,
+      "page_id": 11,
+      "polygon": [
+        [
+          53.490234375,
+          97.3660888671875
+        ],
+        [
+          167.7135009765625,
+          97.3660888671875
+        ],
+        [
+          167.7135009765625,
+          112.3660888671875
+        ],
+        [
+          53.490234375,
+          112.3660888671875
+        ]
+      ]
+    },
+    {
+      "title": "Entwicklungen",
+      "heading_level": null,
+      "page_id": 11,
+      "polygon": [
+        [
+          311.080078125,
+          92.51641845703125
+        ],
+        [
+          398.6291809082031,
+          91.65234375
+        ],
+        [
+          398.6291809082031,
+          104.51641845703125
+        ],
+        [
+          311.080078125,
+          104.51641845703125
+        ]
+      ]
+    },
+    {
+      "title": "Sch\u00e4tze",
+      "heading_level": null,
+      "page_id": 11,
+      "polygon": [
+        [
+          311.080078125,
+          257.23651123046875
+        ],
+        [
+          356.95318603515625,
+          257.23651123046875
+        ],
+        [
+          356.95318603515625,
+          269.23651123046875
+        ],
+        [
+          311.080078125,
+          269.23651123046875
+        ]
+      ]
+    },
+    {
+      "title": "Was passiert als n\u00e4chstes?",
+      "heading_level": null,
+      "page_id": 11,
+      "polygon": [
+        [
+          312.57421875,
+          386.8062438964844
+        ],
+        [
+          493.66229248046875,
+          386.71875
+        ],
+        [
+          493.66229248046875,
+          401.8062438964844
+        ],
+        [
+          312.57421875,
+          401.8062438964844
+        ]
+      ]
+    },
+    {
+      "title": "Erfahrungspunkte",
+      "heading_level": null,
+      "page_id": 11,
+      "polygon": [
+        [
+          311.9765625,
+          570.4111175537109
+        ],
+        [
+          415.98480224609375,
+          570.4111175537109
+        ],
+        [
+          415.98480224609375,
+          582.4111175537109
+        ],
+        [
+          311.9765625,
+          582.4111175537109
+        ]
+      ]
+    }
+  ],
+  "page_stats": [
+    {
+      "page_id": 0,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "TableCell",
+          78
+        ],
+        [
+          "Line",
+          5
+        ],
+        [
+          "TableOfContents",
+          2
+        ],
+        [
+          "Figure",
+          1
+        ],
+        [
+          "SectionHeader",
+          1
+        ],
+        [
+          "Span",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 1,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          399
+        ],
+        [
+          "Line",
+          112
+        ],
+        [
+          "Text",
+          23
+        ],
+        [
+          "SectionHeader",
+          5
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 2,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          705
+        ],
+        [
+          "Line",
+          132
+        ],
+        [
+          "Text",
+          19
+        ],
+        [
+          "ListItem",
+          6
+        ],
+        [
+          "SectionHeader",
+          5
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "ListGroup",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 3,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          818
+        ],
+        [
+          "Line",
+          133
+        ],
+        [
+          "Text",
+          16
+        ],
+        [
+          "SectionHeader",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 4,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Line",
+          28
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ],
+        [
+          "Span",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 5,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          506
+        ],
+        [
+          "Line",
+          100
+        ],
+        [
+          "Text",
+          14
+        ],
+        [
+          "ListItem",
+          5
+        ],
+        [
+          "SectionHeader",
+          2
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "ListGroup",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 6,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          927
+        ],
+        [
+          "Line",
+          130
+        ],
+        [
+          "Text",
+          15
+        ],
+        [
+          "SectionHeader",
+          6
+        ],
+        [
+          "ListItem",
+          4
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "ListGroup",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 7,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          581
+        ],
+        [
+          "Line",
+          115
+        ],
+        [
+          "Text",
+          19
+        ],
+        [
+          "SectionHeader",
+          5
+        ],
+        [
+          "ListItem",
+          4
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "ListGroup",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 8,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          172
+        ],
+        [
+          "Line",
+          57
+        ],
+        [
+          "Text",
+          12
+        ],
+        [
+          "SectionHeader",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 9,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          802
+        ],
+        [
+          "Line",
+          124
+        ],
+        [
+          "Text",
+          23
+        ],
+        [
+          "SectionHeader",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 10,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          705
+        ],
+        [
+          "Line",
+          128
+        ],
+        [
+          "Text",
+          13
+        ],
+        [
+          "ListItem",
+          10
+        ],
+        [
+          "SectionHeader",
+          5
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "ListGroup",
+          2
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 11,
+      "text_extraction_method": "pdftext",
+      "block_counts": [
+        [
+          "Span",
+          769
+        ],
+        [
+          "Line",
+          131
+        ],
+        [
+          "Text",
+          19
+        ],
+        [
+          "SectionHeader",
+          5
+        ],
+        [
+          "ListItem",
+          3
+        ],
+        [
+          "PageFooter",
+          2
+        ],
+        [
+          "Picture",
+          1
+        ],
+        [
+          "ListGroup",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    },
+    {
+      "page_id": 12,
+      "text_extraction_method": "surya",
+      "block_counts": [
+        [
+          "Picture",
+          1
+        ]
+      ],
+      "block_metadata": {
+        "llm_request_count": 0,
+        "llm_error_count": 0,
+        "llm_tokens_used": 0,
+        "previous_text": "",
+        "previous_type": "",
+        "previous_order": 0
+      }
+    }
+  ],
+  "debug_data_path": "debug_data\\starterset_adv_de"
+}
