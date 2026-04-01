@@ -27,7 +27,7 @@ export const CampaignSelector = ({ onSelect }: { onSelect: (campaignId: string, 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`http://${window.location.hostname}:8001/api/campaigns`)
+    fetch('/api/campaigns')
       .then(res => res.json())
       .then(data => {
         setCampaigns(data);
@@ -91,7 +91,7 @@ export const CampaignSelector = ({ onSelect }: { onSelect: (campaignId: string, 
                 {/* Cover Image */}
                 <div style={{
                   height: '160px',
-                  background: `url(http://${window.location.hostname}:8001/api/campaigns/${c.id}/cover) center/cover`,
+                  background: `url(/api/campaigns/${c.id}/cover) center/cover`,
                   borderBottom: '1px solid var(--panel-border)',
                   position: 'relative',
                 }}>

@@ -11,16 +11,19 @@ export class SpeechClient {
   private onMessageReceived: (speaker: 'user' | 'dm', msg: string) => void;
   private onStateChange: (state: 'connected' | 'disconnected' | 'error') => void;
   private onDmSpeakingChange: ((speaking: boolean) => void) | null = null;
+  private onDiceRequest: ((die: string) => void) | null = null;
 
   constructor(
     onMessageReceived: (speaker: 'user' | 'dm', msg: string) => void,
     onStateChange: (state: 'connected' | 'disconnected' | 'error') => void,
     onDmSpeakingChange?: (speaking: boolean) => void,
-    language: string = 'en'
+    language: string = 'en',
+    onDiceRequest?: (die: string) => void
   ) {
     this.onMessageReceived = onMessageReceived;
     this.onStateChange = onStateChange;
     this.onDmSpeakingChange = onDmSpeakingChange || null;
+    this.onDiceRequest = onDiceRequest || null;
     this.language = language;
     this.initSpeechRecognition();
   }
@@ -102,6 +105,8 @@ export class SpeechClient {
           } else if (data.type === 'turn_complete') {
             this.isDmSpeaking = false;
             this.onDmSpeakingChange?.(false);
+          } else if (data.type === 'dice_request') {
+            this.onDiceRequest?.(data.die);
           }
         } else if (event.data instanceof ArrayBuffer) {
            const queuedTranscript = this.transcriptQueue.shift();

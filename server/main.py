@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import re
 from typing import Optional
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,6 +27,9 @@ app.add_middleware(
 )
 
 campaign_mgr = CampaignManager()
+
+# Regex to detect [ROLL:dX] tags in LLM output
+ROLL_TAG_RE = re.compile(r'\[ROLL:(d\d+)\]', re.IGNORECASE)
 
 
 # ─── Campaign REST Endpoints ───────────────────────────────────────────
@@ -104,12 +108,31 @@ async def chat_endpoint(
                 async for sentence in llm.generate_sentences(context):
                     if not sentence.strip():
                         continue
+
+                    # Check for [ROLL:dX] tag in the sentence
+                    roll_match = ROLL_TAG_RE.search(sentence)
+                    die_type = None
+                    if roll_match:
+                        die_type = roll_match.group(1).lower()  # e.g. "d6"
+                        # Strip the tag from the sentence text
+                        sentence = ROLL_TAG_RE.sub('', sentence).strip()
+
                     await websocket.send_json({
                         "type": "transcript",
                         "speaker": "dm",
                         "content": sentence,
                     })
                     await sentence_queue.put(sentence)
+
+                    # Send dice request after the transcript so the frontend
+                    # shows the message and then switches the die
+                    if die_type:
+                        await websocket.send_json({
+                            "type": "dice_request",
+                            "die": die_type,
+                        })
+                        logger.info(f"Dice request sent: {die_type}")
+
                 await sentence_queue.put(None)
 
             async def consumer():
@@ -131,3 +154,4 @@ async def chat_endpoint(
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
+

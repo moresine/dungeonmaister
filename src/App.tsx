@@ -43,6 +43,7 @@ const PlaySession = () => {
   const campaignId = searchParams.get('campaign') || '';
   const language = searchParams.get('lang') || 'en';
   const [latestRoll, setLatestRoll] = useState<number | null>(null);
+  const [requestedDie, setRequestedDie] = useState<string>('d20');
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', position: 'relative' }}>
@@ -63,8 +64,8 @@ const PlaySession = () => {
           </span>
         )}
       </div>
-      <GameMasterInterface latestDiceRoll={latestRoll} language={language} campaignId={campaignId} />
-      <DiceRoller onRoll={(res) => setLatestRoll(res)} />
+      <GameMasterInterface latestDiceRoll={latestRoll} language={language} campaignId={campaignId} onDiceRequest={setRequestedDie} />
+      <DiceRoller onRoll={(res) => setLatestRoll(res)} requestedDie={requestedDie} />
     </div>
   );
 };

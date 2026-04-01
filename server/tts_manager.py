@@ -7,17 +7,17 @@ class TTSManager:
     VOICE_CONFIGS = {
         "en": {
             "model": "en_GB-alan-medium.onnx",
-            "length_scale": 1.15,
-            "noise_scale": 0.8,
-            "noise_w": 0.9,
-            "sentence_silence": 0.3,
+            "length_scale": 1.0,
+            "noise_scale": 0.667,
+            "noise_w": 0.8,
+            "sentence_silence": 0.2,
         },
         "de": {
             "model": "de_DE-thorsten-high.onnx",
-            "length_scale": 1.1,
-            "noise_scale": 0.8,
-            "noise_w": 0.9,
-            "sentence_silence": 0.3,
+            "length_scale": 1.0,
+            "noise_scale": 0.667,
+            "noise_w": 0.8,
+            "sentence_silence": 0.2,
         },
     }
 

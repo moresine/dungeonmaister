@@ -42,7 +42,7 @@ class RAGEngine:
         print(f"Ingesting text into collection '{self.active_collection}'...")
 
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-        from langchain.schema import Document
+        from langchain_core.documents import Document
         documents = [Document(page_content=text, metadata={"source": source})]
         chunks = text_splitter.split_documents(documents)
 

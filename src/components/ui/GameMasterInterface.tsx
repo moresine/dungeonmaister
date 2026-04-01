@@ -7,6 +7,7 @@ interface GameMasterProps {
   latestDiceRoll?: number | null;
   language?: string;
   campaignId?: string;
+  onDiceRequest?: (die: string) => void;
 }
 
 const UI_LABELS = {
@@ -34,7 +35,7 @@ const UI_LABELS = {
   },
 };
 
-export const GameMasterInterface = ({ latestDiceRoll, language = 'en', campaignId = '' }: GameMasterProps) => {
+export const GameMasterInterface = ({ latestDiceRoll, language = 'en', campaignId = '', onDiceRequest }: GameMasterProps) => {
   const labels = UI_LABELS[language as keyof typeof UI_LABELS] || UI_LABELS.en;
 
   const [messages, setMessages] = useState<{role: 'user' | 'dm', content: string}[]>([
@@ -120,13 +121,18 @@ export const GameMasterInterface = ({ latestDiceRoll, language = 'en', campaignI
         if (speaking) setIsMicOpen(false);
       };
 
-      const client = new SpeechClient(onMessage, onState, onDmSpeaking, language);
+      const handleDiceRequest = (die: string) => {
+        onDiceRequest?.(die);
+      };
+
+      const client = new SpeechClient(onMessage, onState, onDmSpeaking, language, handleDiceRequest);
       clientRef.current = client;
       
-      // Build WebSocket URL with language and campaign params
+      // Build WebSocket URL routed through Vite's proxy (handles TLS for remote devices)
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const params = new URLSearchParams({ lang: language });
       if (campaignId) params.set('campaign', campaignId);
-      await client.connect(`ws://${window.location.hostname}:8001/api/chat/stream?${params.toString()}`);
+      await client.connect(`${wsProtocol}//${window.location.host}/api/chat/stream?${params.toString()}`);
     }
   };
 
