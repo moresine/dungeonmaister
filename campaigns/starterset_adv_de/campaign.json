@@ -1,0 +1,10 @@
+{
+  "id": "starterset_adv_de",
+  "title": "Die Verlorene Mine von Phandelver",
+  "description": "Ein Einstiegsabenteuer für 4-5 Charaktere der 1. Stufe. Begleitet den Zwerg Gundren Felssucher auf einer gefährlichen Reise durch die Schwertküste.",
+  "language": "de",
+  "content_file": "starterset_adv_de.md",
+  "cover_image": "_page_0_Figure_0.jpeg",
+  "level_range": "1-5",
+  "players": "4-5"
+}

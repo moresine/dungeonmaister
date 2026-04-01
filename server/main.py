@@ -1,8 +1,9 @@
 import asyncio
 import logging
-from typing import List, Optional
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from typing import Optional
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
 # Initialize logger
@@ -11,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 from llm_manager import LLMManager
 from tts_manager import TTSManager
+from campaign_manager import CampaignManager
 
 app = FastAPI(title="DungeonMaister Backend")
 
@@ -23,53 +25,94 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-llm = LLMManager()
-tts = TTSManager()
+campaign_mgr = CampaignManager()
 
-class ChatRequest(BaseModel):
-    text: str
-    dice_roll: Optional[int] = None
 
-@app.on_event("startup")
-async def startup_event():
-    logger.info("Initializing models on startup...")
-    # Optional: prewarm models here
-    pass
+# ─── Campaign REST Endpoints ───────────────────────────────────────────
+
+@app.get("/api/campaigns")
+async def list_campaigns():
+    """Return all available campaigns."""
+    campaigns = campaign_mgr.list_campaigns()
+    # Strip internal _dir field before sending to frontend
+    safe = []
+    for c in campaigns:
+        entry = {k: v for k, v in c.items() if not k.startswith("_")}
+        safe.append(entry)
+    return safe
+
+
+@app.get("/api/campaigns/{campaign_id}/cover")
+async def get_campaign_cover(campaign_id: str):
+    """Serve the cover image for a campaign."""
+    path = campaign_mgr.get_cover_image_path(campaign_id)
+    if path:
+        return FileResponse(path)
+    return JSONResponse({"error": "Cover not found"}, status_code=404)
+
+
+# ─── WebSocket Chat Endpoint ───────────────────────────────────────────
 
 @app.websocket("/api/chat/stream")
-async def chat_endpoint(websocket: WebSocket):
+async def chat_endpoint(
+    websocket: WebSocket,
+    lang: str = Query(default="en"),
+    campaign: str = Query(default=""),
+):
     await websocket.accept()
-    logger.info("Frontend connected to /api/chat/stream websocket.")
+    logger.info(f"Frontend connected. lang={lang}, campaign={campaign}")
+
+    # Create per-session LLM and TTS with the requested language
+    llm = LLMManager(language=lang)
+    tts = TTSManager(language=lang)
+
+    # If a campaign is selected, load its context
+    if campaign:
+        # Set up per-campaign RAG collection
+        llm.rag.set_campaign(campaign)
+
+        # Ingest campaign content if not already done
+        if not llm.rag.is_collection_populated():
+            content = campaign_mgr.get_campaign_content(campaign)
+            if content:
+                logger.info(f"Ingesting campaign '{campaign}' into RAG...")
+                llm.rag.ingest_text(content, source=campaign)
+
+        # Inject campaign summary into system prompt
+        summary = campaign_mgr.get_campaign_summary(campaign)
+        if summary:
+            llm.set_campaign_context(summary)
+            logger.info(f"Campaign context loaded for '{campaign}'")
+
     try:
         while True:
-            # Receive STT string from frontend
             data = await websocket.receive_json()
             user_text = data.get("text", "")
             dice_roll = data.get("dice_roll")
-            
+
             if not user_text:
                 continue
-                
+
             logger.info(f"User: {user_text} | Roll: {dice_roll}")
             context = f"User says: {user_text}"
             if dice_roll is not None:
                 context += f" | They rolled a {dice_roll}."
 
             sentence_queue = asyncio.Queue()
-            
+
             async def producer():
-                # Stream sentences into the queue instantly as Ollama finishes them
                 async for sentence in llm.generate_sentences(context):
                     if not sentence.strip():
                         continue
-                    # Send text transcript immediately to UI
-                    await websocket.send_json({"type": "transcript", "speaker": "dm", "content": sentence})
+                    await websocket.send_json({
+                        "type": "transcript",
+                        "speaker": "dm",
+                        "content": sentence,
+                    })
                     await sentence_queue.put(sentence)
-                # Signal end of stream
                 await sentence_queue.put(None)
-                
+
             async def consumer():
-                # Continuously render TTS in the background as fast as sentences arrive
                 while True:
                     sentence = await sentence_queue.get()
                     if sentence is None:
@@ -77,15 +120,13 @@ async def chat_endpoint(websocket: WebSocket):
                     audio_bytes = await tts.synthesize_audio_stream(sentence)
                     if audio_bytes:
                         await websocket.send_bytes(audio_bytes)
-            
-            # Unleash both workers concurrently
+
             await asyncio.gather(producer(), consumer())
-            
-            # Signal end of turn
             await websocket.send_json({"type": "turn_complete"})
 
     except WebSocketDisconnect:
         logger.info("Frontend disconnected.")
+
 
 if __name__ == "__main__":
     import uvicorn

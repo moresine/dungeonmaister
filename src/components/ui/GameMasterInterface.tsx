@@ -3,9 +3,42 @@ import { Mic, MicOff, Send, Wifi, WifiOff, AlertCircle, Radio } from 'lucide-rea
 import { dmInstance } from '../../services/AiDungeonMaster';
 import { SpeechClient } from '../../services/SpeechClient';
 
-export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: number | null }) => {
+interface GameMasterProps {
+  latestDiceRoll?: number | null;
+  language?: string;
+  campaignId?: string;
+}
+
+const UI_LABELS = {
+  en: {
+    chatLog: 'Chat Log',
+    connecting: 'Connecting to DungeonMaister...',
+    connected: 'DungeonMaister Backend Active',
+    error: 'DungeonMaister Backend Unreachable',
+    dmSpeaking: 'The DungeonMaister is speaking — mic is muted',
+    pondering: 'The DungeonMaister is pondering...',
+    placeholder: 'Speak to the DungeonMaister or type here...',
+    dmSpeakingPlaceholder: 'The DungeonMaister is speaking...',
+    welcome: 'Ah, travelers! Welcome to the tavern. I am the DungeonMaister. Are you ready to begin your journey, or shall we start with a tutorial of the rules?',
+  },
+  de: {
+    chatLog: 'Spielprotokoll',
+    connecting: 'Verbinde mit DungeonMaister...',
+    connected: 'DungeonMaister Backend Aktiv',
+    error: 'DungeonMaister Backend nicht erreichbar',
+    dmSpeaking: 'Der DungeonMaister spricht — Mikrofon ist stumm',
+    pondering: 'Der DungeonMaister grübelt...',
+    placeholder: 'Sprich zum DungeonMaister oder tippe hier...',
+    dmSpeakingPlaceholder: 'Der DungeonMaister spricht...',
+    welcome: 'Ah, Reisende! Willkommen in der Taverne. Ich bin der DungeonMaister. Seid ihr bereit, euer Abenteuer zu beginnen?',
+  },
+};
+
+export const GameMasterInterface = ({ latestDiceRoll, language = 'en', campaignId = '' }: GameMasterProps) => {
+  const labels = UI_LABELS[language as keyof typeof UI_LABELS] || UI_LABELS.en;
+
   const [messages, setMessages] = useState<{role: 'user' | 'dm', content: string}[]>([
-    { role: 'dm', content: 'Ah, travelers! Welcome to the tavern. I am the DungeonMaister. Are you ready to begin your journey, or shall we start with a tutorial of the rules?' }
+    { role: 'dm', content: labels.welcome }
   ]);
   const [inputText, setInputText] = useState('');
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -44,7 +77,6 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
           clientRef.current.sendDiceRoll(diceRoll);
        }
     } else {
-      // Fallback Mock DM if disconnected
       setIsTyping(true);
       const response = await dmInstance.getResponse(text, diceRoll);
       setIsTyping(false);
@@ -59,7 +91,6 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latestDiceRoll]);
 
-  /** Connect/disconnect the WebSocket session */
   const toggleSession = async () => {
     if (isSessionActive) {
       if (clientRef.current) clientRef.current.stop();
@@ -86,22 +117,22 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
 
       const onDmSpeaking = (speaking: boolean) => {
         setIsDmSpeaking(speaking);
-        if (speaking) {
-          setIsMicOpen(false);
-        }
+        if (speaking) setIsMicOpen(false);
       };
 
-      const client = new SpeechClient(onMessage, onState, onDmSpeaking);
+      const client = new SpeechClient(onMessage, onState, onDmSpeaking, language);
       clientRef.current = client;
       
-      await client.connect(`ws://${window.location.hostname}:8001/api/chat/stream`);
+      // Build WebSocket URL with language and campaign params
+      const params = new URLSearchParams({ lang: language });
+      if (campaignId) params.set('campaign', campaignId);
+      await client.connect(`ws://${window.location.hostname}:8001/api/chat/stream?${params.toString()}`);
     }
   };
 
-  /** Push-to-talk: toggle mic on/off */
   const toggleMic = () => {
     if (!clientRef.current || connectionState !== 'connected') return;
-    if (isDmSpeaking) return; // Can't talk while DM is speaking
+    if (isDmSpeaking) return;
     
     if (isMicOpen) {
       clientRef.current.closeMic();
@@ -159,18 +190,17 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 4rem)', maxHeight: '800px', maxWidth: '1000px', margin: '2rem auto', padding: '0 1rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-        <div>Chat Log</div>
+        <div>{labels.chatLog}</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: connectionState === 'connected' ? '#10b981' : connectionState === 'error' ? 'var(--accent-danger)' : 'var(--text-secondary)' }}>
           {connectionState === 'connected' && <Wifi size={14} />}
           {connectionState === 'disconnected' && <WifiOff size={14} />}
           {connectionState === 'error' && <AlertCircle size={14} />}
-          {connectionState === 'connecting' && <span className="streaming-pulse" style={{ animation: 'pulse 2s infinite' }}>Connecting to DungeonMaister...</span>}
-          {connectionState === 'connected' && <span>DungeonMaister Backend Active</span>}
-          {connectionState === 'error' && <span>DungeonMaister Backend Unreachable</span>}
+          {connectionState === 'connecting' && <span className="streaming-pulse" style={{ animation: 'pulse 2s infinite' }}>{labels.connecting}</span>}
+          {connectionState === 'connected' && <span>{labels.connected}</span>}
+          {connectionState === 'error' && <span>{labels.error}</span>}
         </div>
       </div>
 
-      {/* DM Speaking indicator */}
       {isDmSpeaking && (
         <div style={{
           display: 'flex', alignItems: 'center', gap: '0.5rem',
@@ -183,7 +213,7 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
           animation: 'pulse 2s infinite'
         }}>
           <Radio size={14} />
-          <span>The DungeonMaister is speaking — mic is muted</span>
+          <span>{labels.dmSpeaking}</span>
         </div>
       )}
 
@@ -214,13 +244,12 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
             color: 'var(--accent-magic)',
             fontStyle: 'italic'
           }}>
-            The DungeonMaister is pondering...
+            {labels.pondering}
           </div>
         )}
       </div>
 
       <div className="glass-panel" style={{ marginTop: '1.5rem', padding: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
-        {/* Audio level bar when mic is open */}
         {isMicOpen && (
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'rgba(255,255,255,0.05)' }}>
             <div style={{ 
@@ -233,7 +262,6 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
           </div>
         )}
 
-        {/* Session toggle (connect/disconnect) */}
         <button 
           onClick={toggleSession}
           style={{ 
@@ -255,7 +283,6 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
           {isSessionActive ? <Wifi size={18} /> : <WifiOff size={18} />}
         </button>
 
-        {/* Push-to-talk button */}
         <button 
           onClick={toggleMic}
           disabled={!isSessionActive || connectionState !== 'connected' || isDmSpeaking}
@@ -308,7 +335,7 @@ export const GameMasterInterface = ({ latestDiceRoll }: { latestDiceRoll?: numbe
           value={inputText}
           onChange={e => setInputText(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSend()}
-          placeholder={isDmSpeaking ? "The DungeonMaister is speaking..." : "Speak to the DungeonMaister or type here..."}
+          placeholder={isDmSpeaking ? labels.dmSpeakingPlaceholder : labels.placeholder}
           disabled={isDmSpeaking}
           style={{ flex: 1, padding: '1rem', borderRadius: '8px', border: '1px solid var(--panel-border)', background: 'rgba(0,0,0,0.5)', color: 'white', fontSize: '1.1rem', fontFamily: 'var(--font-body)' }}
         />

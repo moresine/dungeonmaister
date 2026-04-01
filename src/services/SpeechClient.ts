@@ -3,10 +3,10 @@ export class SpeechClient {
   private audioContext: AudioContext | null = null;
   private nextStartTime: number = 0;
   private recognition: any = null;
-  private isRecording: boolean = false;
   private isMicOpen: boolean = false;
   private isDmSpeaking: boolean = false;
   private transcriptQueue: {speaker: 'user'|'dm', content: string}[] = [];
+  private language: string;
   
   private onMessageReceived: (speaker: 'user' | 'dm', msg: string) => void;
   private onStateChange: (state: 'connected' | 'disconnected' | 'error') => void;
@@ -15,21 +15,23 @@ export class SpeechClient {
   constructor(
     onMessageReceived: (speaker: 'user' | 'dm', msg: string) => void,
     onStateChange: (state: 'connected' | 'disconnected' | 'error') => void,
-    onDmSpeakingChange?: (speaking: boolean) => void
+    onDmSpeakingChange?: (speaking: boolean) => void,
+    language: string = 'en'
   ) {
     this.onMessageReceived = onMessageReceived;
     this.onStateChange = onStateChange;
     this.onDmSpeakingChange = onDmSpeakingChange || null;
+    this.language = language;
     this.initSpeechRecognition();
   }
 
   private initSpeechRecognition() {
-    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
       this.recognition = new SpeechRecognition();
       this.recognition.continuous = false;
       this.recognition.interimResults = true;
-      this.recognition.lang = 'en-US';
+      this.recognition.lang = this.language === 'de' ? 'de-DE' : 'en-US';
 
       this.recognition.onresult = (event: any) => {
         let finalTranscript = '';
@@ -53,7 +55,6 @@ export class SpeechClient {
           if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             this.ws.send(JSON.stringify({ text: finalTranscript.trim() }));
           }
-          // After sending, close the mic — user must push-to-talk again
           this.closeMic();
         }
       };
@@ -64,7 +65,6 @@ export class SpeechClient {
         }
       };
       this.recognition.onend = () => {
-         // Only auto-restart if mic is explicitly open (push-to-talk held)
          if (this.isMicOpen) {
             try { this.recognition.start(); } catch(e) {}
          }
@@ -74,7 +74,7 @@ export class SpeechClient {
     }
   }
 
-  public async connect(url: string = `ws://${window.location.hostname}:8001/api/chat/stream`) {
+  public async connect(url: string) {
     try {
       if (!this.audioContext) this.audioContext = new AudioContext();
       if (this.audioContext.state === 'suspended') {
@@ -87,15 +87,12 @@ export class SpeechClient {
 
       this.ws.onopen = () => {
         this.onStateChange('connected');
-        this.isRecording = true;
-        // Don't auto-start mic — wait for push-to-talk
       };
 
       this.ws.onmessage = async (event) => {
         if (typeof event.data === 'string') {
           const data = JSON.parse(event.data);
           if (data.type === 'transcript') {
-            // DM is responding — make sure mic is off
             if (!this.isDmSpeaking) {
               this.isDmSpeaking = true;
               this.closeMic();
@@ -103,7 +100,6 @@ export class SpeechClient {
             }
             this.transcriptQueue.push({ speaker: data.speaker, content: data.content });
           } else if (data.type === 'turn_complete') {
-            // DM finished speaking — allow push-to-talk again
             this.isDmSpeaking = false;
             this.onDmSpeakingChange?.(false);
           }
@@ -127,9 +123,8 @@ export class SpeechClient {
     }
   }
 
-  /** Open the mic for push-to-talk */
   public openMic() {
-    if (this.isDmSpeaking) return; // Don't allow mic while DM is talking
+    if (this.isDmSpeaking) return;
     if (this.isMicOpen) return;
     this.isMicOpen = true;
     if (this.recognition) {
@@ -137,7 +132,6 @@ export class SpeechClient {
     }
   }
 
-  /** Close the mic (release push-to-talk) */
   public closeMic() {
     this.isMicOpen = false;
     if (this.recognition) {
@@ -145,7 +139,6 @@ export class SpeechClient {
     }
   }
 
-  /** Check if the mic is currently open */
   public get micOpen(): boolean {
     return this.isMicOpen;
   }
@@ -191,7 +184,6 @@ export class SpeechClient {
   }
 
   public stop() {
-    this.isRecording = false;
     this.isMicOpen = false;
     this.isDmSpeaking = false;
     if (this.recognition) {
