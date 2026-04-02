@@ -28,8 +28,13 @@ app.add_middleware(
 
 campaign_mgr = CampaignManager()
 
-# Regex to detect [ROLL:dX] tags in LLM output
+# Regex to detect [ROLL:dX] and [EMOTION:X] tags in LLM output
 ROLL_TAG_RE = re.compile(r'\[ROLL:(d\d+)\]', re.IGNORECASE)
+# Catch all variations: [EMOTION:calm], [Emotion: Calm], Emotion: calm, (EMOTION:calm), etc.
+EMOTION_TAG_RE = re.compile(
+    r'[\[\(]?\s*EMOTION\s*[:]\s*(calm|normal|dramatic|intense)\s*[\]\)]?',
+    re.IGNORECASE
+)
 
 
 # ─── Campaign REST Endpoints ───────────────────────────────────────────
@@ -109,12 +114,18 @@ async def chat_endpoint(
                     if not sentence.strip():
                         continue
 
+                    # Check for [EMOTION:X] tag in the sentence
+                    emotion_match = EMOTION_TAG_RE.search(sentence)
+                    emotion = "normal"
+                    if emotion_match:
+                        emotion = emotion_match.group(1).lower()
+                        sentence = EMOTION_TAG_RE.sub('', sentence).strip()
+
                     # Check for [ROLL:dX] tag in the sentence
                     roll_match = ROLL_TAG_RE.search(sentence)
                     die_type = None
                     if roll_match:
                         die_type = roll_match.group(1).lower()  # e.g. "d6"
-                        # Strip the tag from the sentence text
                         sentence = ROLL_TAG_RE.sub('', sentence).strip()
 
                     await websocket.send_json({
@@ -122,7 +133,7 @@ async def chat_endpoint(
                         "speaker": "dm",
                         "content": sentence,
                     })
-                    await sentence_queue.put(sentence)
+                    await sentence_queue.put((sentence, emotion))
 
                     # Send dice request after the transcript so the frontend
                     # shows the message and then switches the die
@@ -137,10 +148,11 @@ async def chat_endpoint(
 
             async def consumer():
                 while True:
-                    sentence = await sentence_queue.get()
-                    if sentence is None:
+                    item = await sentence_queue.get()
+                    if item is None:
                         break
-                    audio_bytes = await tts.synthesize_audio_stream(sentence)
+                    sentence, emotion = item
+                    audio_bytes = await tts.synthesize_audio_stream(sentence, emotion=emotion)
                     if audio_bytes:
                         await websocket.send_bytes(audio_bytes)
 

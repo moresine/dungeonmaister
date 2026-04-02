@@ -3,21 +3,13 @@ import asyncio
 
 
 class TTSManager:
-    # Map language codes to their Piper voice models and tuning params
+    # Map language codes to their Piper voice models
     VOICE_CONFIGS = {
         "en": {
             "model": "en_GB-alan-medium.onnx",
-            "length_scale": 1.0,
-            "noise_scale": 0.667,
-            "noise_w": 0.8,
-            "sentence_silence": 0.2,
         },
         "de": {
             "model": "de_DE-thorsten-high.onnx",
-            "length_scale": 1.0,
-            "noise_scale": 0.667,
-            "noise_w": 0.8,
-            "sentence_silence": 0.2,
         },
     }
 
@@ -28,7 +20,7 @@ class TTSManager:
         if language in self.VOICE_CONFIGS:
             self.language = language
 
-    async def synthesize_audio_stream(self, text: str) -> bytes:
+    async def synthesize_audio_stream(self, text: str, emotion: str = "normal") -> bytes:
         config = self.VOICE_CONFIGS.get(self.language, self.VOICE_CONFIGS["en"])
         model_path = config["model"]
 
@@ -40,11 +32,7 @@ class TTSManager:
         safe_text = text.replace("'", "'\\''")
 
         piper_cmd = (
-            f"echo '{safe_text}' | ./venv/bin/piper --model {model_path} --output_file - "
-            f"--length-scale {config['length_scale']} "
-            f"--noise-scale {config['noise_scale']} "
-            f"--noise-w {config['noise_w']} "
-            f"--sentence-silence {config['sentence_silence']}"
+            f"echo '{safe_text}' | ./venv/bin/piper --model {model_path} --output_file -"
         )
 
         proc = await asyncio.create_subprocess_shell(
