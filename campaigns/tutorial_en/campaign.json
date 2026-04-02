@@ -1,0 +1,10 @@
+{
+  "id": "tutorial_en",
+  "title": "Tutorial: Your First Adventure",
+  "description": "A guided introduction to DungeonMaister and the rules of Dungeons & Dragons. Learn how to create a character and play the game.",
+  "language": "en",
+  "content_file": "tutorial_en.md",
+  "cover_image": "",
+  "level_range": "1",
+  "players": "1"
+}

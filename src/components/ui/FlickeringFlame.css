@@ -1,0 +1,49 @@
+.flame-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.flame {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  background: gold;
+  border-radius: 50% 0 50% 50%;
+  transform: translateX(-50%) rotate(-45deg);
+  animation: flicker 2s infinite;
+}
+
+.flame.red {
+  width: 60px;
+  height: 60px;
+  background: red;
+  animation-delay: 0.2s;
+}
+
+.flame.orange {
+  width: 40px;
+  height: 40px;
+  background: orange;
+  animation-delay: 0.4s;
+}
+
+.flame.white {
+  width: 30px;
+  height: 30px;
+  background: white;
+  animation-delay: 0.6s;
+}
+
+@keyframes flicker {
+  0%, 100% {
+    transform: translateX(-50%) rotate(-45deg) scaleY(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-50%) rotate(-45deg) scaleY(1.5);
+    opacity: 0.8;
+  }
+}

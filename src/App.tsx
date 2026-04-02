@@ -6,6 +6,7 @@ import { DiceRoller } from './components/ui/DiceRoller';
 import { CampaignSelector } from './components/ui/CampaignSelector';
 import { CharacterHub } from './components/ui/CharacterHub';
 import { CharacterCreator } from './components/ui/CharacterCreator';
+import TabletView from './components/ui/TabletView';
 import './index.css';
 
 const Home = () => {
@@ -33,6 +34,7 @@ const Home = () => {
 
       <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem' }}>
         <Link to="/characters"><button className="btn-secondary">Character Hub</button></Link>
+        <Link to="/tablet"><button className="btn-secondary">Tablet View</button></Link>
       </div>
     </div>
   );
@@ -79,6 +81,7 @@ function App() {
           <Route path="/play" element={<PlaySession />} />
           <Route path="/characters" element={<CharacterHub />} />
           <Route path="/character-creator" element={<CharacterCreator />} />
+          <Route path="/tablet" element={<TabletView />} />
         </Routes>
       </div>
     </BrowserRouter>

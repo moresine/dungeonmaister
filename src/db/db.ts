@@ -16,6 +16,7 @@ export interface Character {
     wis: number;
     cha: number;
   };
+  inventory: string[];
 }
 
 export class DungeonMaisterDB extends Dexie {
@@ -25,6 +26,13 @@ export class DungeonMaisterDB extends Dexie {
     super('DungeonMaisterDB');
     this.version(1).stores({
       characters: '++id, name, charClass'
+    });
+    this.version(2).stores({
+      characters: '++id, name, charClass, inventory'
+    }).upgrade(tx => {
+      return tx.table("characters").toCollection().modify(char => {
+        char.inventory = [];
+      });
     });
   }
 }
