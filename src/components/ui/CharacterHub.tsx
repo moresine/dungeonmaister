@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { db, type Character } from '../../db/db';
+import { type Character, getCharacters } from '../../services/api';
 import { Shield, Sword, Heart, Sparkles } from 'lucide-react';
 
 export const CharacterHub = () => {
@@ -8,8 +8,12 @@ export const CharacterHub = () => {
 
   useEffect(() => {
     const loadChars = async () => {
-      const chars = await db.characters.toArray();
-      setCharacters(chars);
+      try {
+        const chars = await getCharacters();
+        setCharacters(chars);
+      } catch (err) {
+        console.error(err);
+      }
     };
     loadChars();
   }, []);

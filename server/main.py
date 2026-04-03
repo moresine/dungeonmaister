@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 from llm_manager import LLMManager
 from tts_manager import TTSManager
 from campaign_manager import CampaignManager
+from character_manager import character_mgr
+from typing import Any, Dict
 
 app = FastAPI(title="DungeonMaister Backend")
 
@@ -29,12 +31,13 @@ app.add_middleware(
 campaign_mgr = CampaignManager()
 
 # Regex to detect [ROLL:dX] and [EMOTION:X] tags in LLM output
-ROLL_TAG_RE = re.compile(r'\[ROLL:(d\d+)\]', re.IGNORECASE)
-# Catch all variations: [EMOTION:calm], [Emotion: Calm], Emotion: calm, (EMOTION:calm), etc.
+# Loose regexes to catch AI drift where it forgets brackets (e.g., 'Roll: d20' instead of '[ROLL:d20]')
+ROLL_TAG_RE = re.compile(r'[\[\(]?\s*ROLL\s*[:]\s*(d\d+)\s*[\]\)]?', re.IGNORECASE)
 EMOTION_TAG_RE = re.compile(
     r'[\[\(]?\s*EMOTION\s*[:]\s*(calm|normal|dramatic|intense)\s*[\]\)]?',
     re.IGNORECASE
 )
+TARGET_TAG_RE = re.compile(r'[\[\(]?\s*TARGET\s*[:]\s*([a-zA-Z0-9_\-\s]+?)(?:[\]\)]|$)', re.IGNORECASE)
 
 
 # ─── Campaign REST Endpoints ───────────────────────────────────────────
@@ -54,10 +57,40 @@ async def list_campaigns():
 @app.get("/api/campaigns/{campaign_id}/cover")
 async def get_campaign_cover(campaign_id: str):
     """Serve the cover image for a campaign."""
-    path = campaign_mgr.get_cover_image_path(campaign_id)
+    path = campaign_mgr.get_campaign_cover_image_path(campaign_id) if hasattr(campaign_mgr, "get_campaign_cover_image_path") else campaign_mgr.get_cover_image_path(campaign_id)
     if path:
         return FileResponse(path)
     return JSONResponse({"error": "Cover not found"}, status_code=404)
+
+
+# ─── Character REST Endpoints ───────────────────────────────────────────
+
+@app.get("/api/characters")
+async def get_characters():
+    chars = character_mgr.get_all_characters()
+    return chars
+
+@app.post("/api/characters")
+async def create_character(char_data: Dict[str, Any]):
+    try:
+        new_char = character_mgr.create_character(char_data)
+        return new_char
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+
+@app.delete("/api/characters/{char_id}")
+async def delete_character(char_id: int):
+    success = character_mgr.delete_character(char_id)
+    if success:
+        return {"status": "ok"}
+    return JSONResponse({"error": "Character not found"}, status_code=404)
+
+@app.put("/api/characters/{char_id}")
+async def update_character(char_id: int, char_data: Dict[str, Any]):
+    success = character_mgr.update_character(char_id, char_data)
+    if success:
+        return {"status": "ok"}
+    return JSONResponse({"error": "Character not found"}, status_code=404)
 
 
 # ─── WebSocket Chat Endpoint ───────────────────────────────────────────
@@ -77,17 +110,13 @@ async def chat_endpoint(
 
     # If a campaign is selected, load its context
     if campaign:
-        # Set up per-campaign RAG collection
         llm.rag.set_campaign(campaign)
-
-        # Ingest campaign content if not already done
         if not llm.rag.is_collection_populated():
             content = campaign_mgr.get_campaign_content(campaign)
             if content:
                 logger.info(f"Ingesting campaign '{campaign}' into RAG...")
                 llm.rag.ingest_text(content, source=campaign)
 
-        # Inject campaign summary into system prompt
         summary = campaign_mgr.get_campaign_summary(campaign)
         if summary:
             llm.set_campaign_context(summary)
@@ -98,12 +127,31 @@ async def chat_endpoint(
             data = await websocket.receive_json()
             user_text = data.get("text", "")
             dice_roll = data.get("dice_roll")
+            party_info = data.get("party")
+            speaker = data.get("speaker", "Player")
+
+            if party_info:
+                llm.set_party_context(party_info)
+                logger.info(f"Party context loaded with {len(party_info)} characters.")
+
+            if "llm_provider" in data:
+                llm.set_provider(
+                    provider=data.get("llm_provider"), 
+                    api_key=data.get("api_key", ""),
+                    model_name=data.get("model_name")
+                )
+                
+            if "tts_provider" in data:
+                tts.set_provider(
+                    provider=data.get("tts_provider"),
+                    api_key=data.get("api_key", "")
+                )
 
             if not user_text:
                 continue
 
-            logger.info(f"User: {user_text} | Roll: {dice_roll}")
-            context = f"User says: {user_text}"
+            logger.info(f"[{speaker}]: {user_text} | Roll: {dice_roll} | Provider: {llm.provider}")
+            context = f"{speaker} says: {user_text}"
             if dice_roll is not None:
                 context += f" | They rolled a {dice_roll}."
 
@@ -114,29 +162,45 @@ async def chat_endpoint(
                     if not sentence.strip():
                         continue
 
-                    # Check for [EMOTION:X] tag in the sentence
-                    emotion_match = EMOTION_TAG_RE.search(sentence)
+                    # Emulate emotion tag formatting
                     emotion = "normal"
+                    emotion_match = EMOTION_TAG_RE.search(sentence)
                     if emotion_match:
                         emotion = emotion_match.group(1).lower()
                         sentence = EMOTION_TAG_RE.sub('', sentence).strip()
 
-                    # Check for [ROLL:dX] tag in the sentence
-                    roll_match = ROLL_TAG_RE.search(sentence)
+                    # Emulate dice tag formatting
                     die_type = None
+                    roll_match = ROLL_TAG_RE.search(sentence)
                     if roll_match:
-                        die_type = roll_match.group(1).lower()  # e.g. "d6"
+                        die_type = roll_match.group(1).lower()
                         sentence = ROLL_TAG_RE.sub('', sentence).strip()
+
+                    # Process target tags
+                    target = None
+                    target_match = TARGET_TAG_RE.search(sentence)
+                    if target_match:
+                        target = target_match.group(1).strip()
+                        sentence = TARGET_TAG_RE.sub('', sentence).strip()
+
+                    if not sentence.strip():
+                         continue
 
                     await websocket.send_json({
                         "type": "transcript",
                         "speaker": "dm",
                         "content": sentence,
                     })
+
+                    if target:
+                        await websocket.send_json({
+                            "type": "target",
+                            "target": target,
+                        })
+                        logger.info(f"Targeting: {target}")
+
                     await sentence_queue.put((sentence, emotion))
 
-                    # Send dice request after the transcript so the frontend
-                    # shows the message and then switches the die
                     if die_type:
                         await websocket.send_json({
                             "type": "dice_request",

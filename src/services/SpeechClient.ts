@@ -12,18 +12,25 @@ export class SpeechClient {
   private onStateChange: (state: 'connected' | 'disconnected' | 'error') => void;
   private onDmSpeakingChange: ((speaking: boolean) => void) | null = null;
   private onDiceRequest: ((die: string) => void) | null = null;
+  private onTarget: ((target: string) => void) | null = null;
+  private speaker: string = 'Player';
+  private llmProvider: string = 'ollama';
+  private ttsProvider: string = 'piper';
+  private apiKey: string = '';
 
   constructor(
     onMessageReceived: (speaker: 'user' | 'dm', msg: string) => void,
     onStateChange: (state: 'connected' | 'disconnected' | 'error') => void,
     onDmSpeakingChange?: (speaking: boolean) => void,
     language: string = 'en',
-    onDiceRequest?: (die: string) => void
+    onDiceRequest?: (die: string) => void,
+    onTarget?: (target: string) => void
   ) {
     this.onMessageReceived = onMessageReceived;
     this.onStateChange = onStateChange;
     this.onDmSpeakingChange = onDmSpeakingChange || null;
     this.onDiceRequest = onDiceRequest || null;
+    this.onTarget = onTarget || null;
     this.language = language;
     this.initSpeechRecognition();
   }
@@ -56,7 +63,7 @@ export class SpeechClient {
           console.log("Finalized Speech:", finalTranscript.trim());
           this.onMessageReceived('user', finalTranscript.trim());
           if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            this.ws.send(JSON.stringify({ text: finalTranscript.trim() }));
+            this.ws.send(JSON.stringify({ text: finalTranscript.trim(), speaker: this.speaker }));
           }
           this.closeMic();
         }
@@ -77,7 +84,20 @@ export class SpeechClient {
     }
   }
 
-  public async connect(url: string) {
+  public setSpeaker(speaker: string) {
+    this.speaker = speaker;
+  }
+
+  public setAiConfig(provider: string, ttsProvider: string, apiKey: string) {
+    this.llmProvider = provider;
+    this.ttsProvider = ttsProvider;
+    this.apiKey = apiKey;
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+       this.ws.send(JSON.stringify({ llm_provider: provider, tts_provider: ttsProvider, api_key: apiKey }));
+    }
+  }
+
+  public async connect(url: string, party: any[] = []) {
     try {
       if (!this.audioContext) this.audioContext = new AudioContext();
       if (this.audioContext.state === 'suspended') {
@@ -90,6 +110,11 @@ export class SpeechClient {
 
       this.ws.onopen = () => {
         this.onStateChange('connected');
+        if (party.length > 0) {
+          this.ws?.send(JSON.stringify({ party, llm_provider: this.llmProvider, tts_provider: this.ttsProvider, api_key: this.apiKey }));
+        } else {
+          this.ws?.send(JSON.stringify({ llm_provider: this.llmProvider, tts_provider: this.ttsProvider, api_key: this.apiKey }));
+        }
       };
 
       this.ws.onmessage = async (event) => {
@@ -107,6 +132,8 @@ export class SpeechClient {
             this.onDmSpeakingChange?.(false);
           } else if (data.type === 'dice_request') {
             this.onDiceRequest?.(data.die);
+          } else if (data.type === 'target') {
+            this.onTarget?.(data.target);
           }
         } else if (event.data instanceof ArrayBuffer) {
            const queuedTranscript = this.transcriptQueue.shift();
@@ -150,13 +177,13 @@ export class SpeechClient {
 
   public async sendText(text: string) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ text: text }));
+      this.ws.send(JSON.stringify({ text: text, speaker: this.speaker }));
     }
   }
 
   public async sendDiceRoll(roll: number) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ text: `I rolled a ${roll}!`, dice_roll: roll }));
+      this.ws.send(JSON.stringify({ text: `I rolled a ${roll}!`, dice_roll: roll, speaker: this.speaker }));
     }
   }
 

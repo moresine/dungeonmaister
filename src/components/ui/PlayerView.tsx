@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { db, type Character } from '../../db/db';
+import { type Character, getCharacters, updateCharacterInventory } from '../../services/api';
 import { Shield, Sword, Heart, Star, BookOpen, Briefcase } from 'lucide-react';
 import {
   DndContext,
@@ -59,11 +59,13 @@ export const PlayerView = ({ characterId }: PlayerViewProps) => {
   useEffect(() => {
     const loadChar = async () => {
       if (characterId) {
-        const char = await db.characters.get(characterId);
-        if (char && (!char.inventory || char.inventory.length === 0)) {
-          char.inventory = ['Health Potion', 'Sword of Ogre Decapitation'];
+        try {
+          const chars = await getCharacters();
+          const char = chars.find(c => c.id === characterId);
+          setCharacter(char || null);
+        } catch (e) {
+          console.error(e);
         }
-        setCharacter(char || null);
       }
     };
     loadChar();
@@ -83,7 +85,7 @@ export const PlayerView = ({ characterId }: PlayerViewProps) => {
         inventory: newInventory,
       });
 
-      db.characters.update(characterId, { inventory: newInventory });
+      updateCharacterInventory(characterId, newInventory).catch(console.error);
     }
   };
 
